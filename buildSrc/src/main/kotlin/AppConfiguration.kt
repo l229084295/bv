@@ -17,10 +17,10 @@ object AppConfiguration {
     }
     val versionCode: Int by lazy { "git rev-list --count HEAD".exec().toInt() }
     const val libVLCVersion = "3.0.18"
-    var googleServicesAvailable = true
+    var googleServicesAvailable = false
 
     init {
-        initConfigurations()
+//        initConfigurations()
     }
 
     private fun initConfigurations() {
