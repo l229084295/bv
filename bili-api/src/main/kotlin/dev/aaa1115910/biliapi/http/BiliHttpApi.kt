@@ -8,12 +8,16 @@ import dev.aaa1115910.biliapi.http.entity.danmaku.DanmakuData
 import dev.aaa1115910.biliapi.http.entity.danmaku.DanmakuResponse
 import dev.aaa1115910.biliapi.http.entity.dynamic.DynamicData
 import dev.aaa1115910.biliapi.http.entity.history.HistoryData
+import dev.aaa1115910.biliapi.http.entity.toview.ToViewData
 import dev.aaa1115910.biliapi.http.entity.home.RcmdIndexData
 import dev.aaa1115910.biliapi.http.entity.home.RcmdTopData
 import dev.aaa1115910.biliapi.http.entity.index.IndexResultData
 import dev.aaa1115910.biliapi.http.entity.pgc.PgcFeedData
 import dev.aaa1115910.biliapi.http.entity.pgc.PgcFeedV3Data
 import dev.aaa1115910.biliapi.http.entity.pgc.PgcWebInitialStateData
+import dev.aaa1115910.biliapi.http.entity.region.RegionDynamic
+import dev.aaa1115910.biliapi.http.entity.region.RegionDynamicList
+import dev.aaa1115910.biliapi.http.entity.region.RegionLocs
 import dev.aaa1115910.biliapi.http.entity.search.AppSearchSquareData
 import dev.aaa1115910.biliapi.http.entity.search.KeywordSuggest
 import dev.aaa1115910.biliapi.http.entity.search.SearchResultData
@@ -75,12 +79,11 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.readBytes
+import io.ktor.client.statement.readRawBytes
 import io.ktor.http.Parameters
 import io.ktor.http.URLProtocol
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.util.InternalAPI
-import io.ktor.util.toByteArray
+import io.ktor.utils.io.InternalAPI
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -361,6 +364,24 @@ object BiliHttpApi {
         parameter("business", business)
         parameter("view_at", viewAt)
         parameter("ps", pageSize)
+        header("Cookie", "SESSDATA=$sessData;")
+    }.body()
+
+    /**
+     * 获取稍后再看列表
+     */
+
+    suspend fun getToView(
+        // max: Long = 0,
+        // business: String = "",
+        // viewAt: Long = 0,
+        // pageSize: Int = 20,
+        sessData: String = ""
+    ): BiliResponse<ToViewData> = client.get("/x/v2/history/toview") {
+        // parameter("max", max)
+        // parameter("business", business)
+        // parameter("view_at", viewAt)
+        // parameter("ps", pageSize)
         header("Cookie", "SESSDATA=$sessData;")
     }.body()
 
@@ -1128,7 +1149,7 @@ object BiliHttpApi {
             parameter("main_ver", mainVer)
             highlight?.let { parameter("highlight", it) }
             parameter("buvid", buvid)
-        }.content.toByteArray().toString(Charsets.UTF_8)
+        }.readRawBytes().toString(Charsets.UTF_8)
         val keywordSuggest = json.decodeFromString<KeywordSuggest>(responseText)
         val result = json.decodeFromJsonElement<KeywordSuggest.Result>(keywordSuggest.result!!)
         keywordSuggest.suggests.addAll(result.tag)
@@ -1518,7 +1539,7 @@ object BiliHttpApi {
     )
 
     suspend fun download(url: String): ByteArray {
-        return client.get(url).readBytes()
+        return client.get(url).readRawBytes()
     }
 
     suspend fun getWebVideoShot(
@@ -1549,6 +1570,65 @@ object BiliHttpApi {
     ): BiliResponse<Equip> = client.get("/x/garb/user/equip") {
         parameter("part", part.value)
         header("Cookie", "SESSDATA=$sessData;")
+    }.body()
+
+    /**
+     * 获取分区动态（App），包含顶部轮播图，大卡片活动推广位，和视频列表第一页
+     */
+    suspend fun getRegionDynamic(
+        rid: Int,
+        accessKey: String
+    ): BiliResponse<RegionDynamic> = client.get("https://app.bilibili.com/x/v2/region/dynamic") {
+        parameter("access_key", accessKey)
+        parameter("build", BiliAppConf.APP_BUILD_CODE)
+        parameter("rid", rid)
+    }.body()
+
+    /**
+     * 获取分区视频列表（App）,用于[getRegionDynamic]加载数据后下滑加载更多数据
+     */
+    suspend fun getRegionDynamicList(
+        rid: Int,
+        ctime: Long = 0,
+        accessKey: String
+    ): BiliResponse<RegionDynamicList> =
+        client.get("https://app.bilibili.com/x/v2/region/dynamic/list") {
+            parameter("access_key", accessKey)
+            parameter("build", BiliAppConf.APP_BUILD_CODE)
+            parameter("rid", rid)
+            parameter("ctime", ctime)
+            parameter("pull", "false")
+        }.body()
+
+    //
+
+    /**
+     * 获取分区内各种插入的banner，例如顶部轮播图，还有插入的广告横幅（Web）
+     *
+     * id:
+     * 4973  动画  douga
+     * 4991  游戏  game
+     * 5004  鬼畜  kichiku
+     * 4979  音乐  music
+     * 4985  舞蹈  dance
+     * 5008  影视  cinephile
+     * 5007  娱乐  ent
+     * 4997  知识  knowledge
+     * 4998  科技  tech
+     * 5005  资讯  information
+     * 5002  美食  food
+     * 5001  生活  life
+     * 5000  汽车  car
+     * 5006  时尚  fashion
+     * 4999  运动  sports
+     * 5003  动物圈 animal
+     */
+    suspend fun getLocs(
+        ids: List<Int>,
+        sessData: String? = null
+    ): RegionLocs = client.get("/x/web-show/res/locs") {
+        parameter("ids", ids.joinToString(","))
+        sessData?.let { header("Cookie", "SESSDATA=$it;") }
     }.body()
 }
 

@@ -1,19 +1,20 @@
 package dev.aaa1115910.bv.viewmodel.pgc
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.aaa1115910.biliapi.entity.pgc.PgcCarouselData
+import dev.aaa1115910.biliapi.entity.CarouselData
 import dev.aaa1115910.biliapi.entity.pgc.PgcFeedData
 import dev.aaa1115910.biliapi.entity.pgc.PgcItem
 import dev.aaa1115910.biliapi.entity.pgc.PgcType
 import dev.aaa1115910.biliapi.repositories.PgcRepository
 import dev.aaa1115910.bv.BVApp
 import dev.aaa1115910.bv.BuildConfig
+import dev.aaa1115910.bv.util.addWithMainContext
+import dev.aaa1115910.bv.util.addAllWithMainContext
 import dev.aaa1115910.bv.util.fInfo
 import dev.aaa1115910.bv.util.fWarn
 import dev.aaa1115910.bv.util.toast
@@ -32,7 +33,7 @@ abstract class PgcViewModel(
     /**
      * 轮播图
      */
-    val carouselItems = mutableStateListOf<PgcCarouselData.CarouselItem>()
+    val carouselItems = mutableStateListOf<CarouselData.CarouselItem>()
 
     /**
      * 猜你喜欢
@@ -46,7 +47,7 @@ abstract class PgcViewModel(
 
     var updating by mutableStateOf(false)
     var hasNext by mutableStateOf(true)
-    var cursor by mutableIntStateOf(0)
+    private var cursor = 0
 
     init {
         loadMore()
@@ -111,7 +112,7 @@ abstract class PgcViewModel(
 
             val carouselData = pgcRepository.getCarousel(pgcType)
             logger.fInfo { "Find $pgcType carousels, size: ${carouselData.items.size}" }
-            carouselItems.addAll(carouselData.items)
+            carouselItems.addAllWithMainContext(carouselData.items)
             logger.debug { "carouselItems: $carouselItems" }
         }.onFailure {
             logger.fInfo { "Update $pgcType carousel failed: ${it.stackTraceToString()}" }
@@ -126,7 +127,7 @@ abstract class PgcViewModel(
      */
     private suspend fun updateFeed() {
         if (updating) return
-        updating = true
+        withContext(Dispatchers.Main) { updating = true }
         logger.fInfo { "Update anime feed" }
         runCatching {
             val pgcFeedData = pgcRepository.getFeed(
@@ -134,18 +135,18 @@ abstract class PgcViewModel(
                 cursor = cursor
             )
             cursor = pgcFeedData.cursor
-            hasNext = pgcFeedData.hasNext
+            withContext(Dispatchers.Main) { hasNext = pgcFeedData.hasNext }
             updateFeedItems(pgcFeedData)
         }.onFailure {
             logger.fInfo { "Update $pgcType feeds failed: ${it.stackTraceToString()}" }
         }
-        updating = false
+        withContext(Dispatchers.Main) { updating = false }
     }
 
     /**
      * 对 [updateFeed] 获取到得数据进行二次整理并更新到 feedItems
      */
-    private fun updateFeedItems(data: PgcFeedData) {
+    private suspend fun updateFeedItems(data: PgcFeedData) {
         logger.fInfo { "update $pgcType feed items: [items: ${data.items.size}, ranks: ${data.ranks.size}]" }
         val epList = mutableStateListOf<PgcItem>()
         epList.addAll(restSubItems)
@@ -153,7 +154,7 @@ abstract class PgcViewModel(
 
         epList.chunked(5).forEach { chunkedVCardList ->
             if (chunkedVCardList.size == 5) {
-                feedItems.add(
+                feedItems.addWithMainContext(
                     FeedListItem(
                         type = FeedListType.Ep,
                         items = chunkedVCardList
@@ -166,7 +167,7 @@ abstract class PgcViewModel(
         }
 
         data.ranks.forEach { rank ->
-            feedItems.add(
+            feedItems.addWithMainContext(
                 FeedListItem(
                     type = FeedListType.Rank,
                     rank = rank

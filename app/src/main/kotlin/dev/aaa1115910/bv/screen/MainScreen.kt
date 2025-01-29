@@ -8,7 +8,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -26,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -38,6 +36,7 @@ import dev.aaa1115910.bv.activities.settings.SettingsActivity
 import dev.aaa1115910.bv.activities.user.FavoriteActivity
 import dev.aaa1115910.bv.activities.user.FollowingSeasonActivity
 import dev.aaa1115910.bv.activities.user.HistoryActivity
+import dev.aaa1115910.bv.activities.user.ToViewActivity
 import dev.aaa1115910.bv.activities.user.LoginActivity
 import dev.aaa1115910.bv.activities.user.UserInfoActivity
 import dev.aaa1115910.bv.component.UserPanel
@@ -168,23 +167,18 @@ fun MainScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.4f))
+                        .background(Color.Black.copy(alpha = 0.6f))
                 ) {
                     AnimatedVisibility(
                         modifier = Modifier
-                            .align(Alignment.TopEnd),
+                            .align(Alignment.Center),
                         visible = showUserPanel,
                         enter = fadeIn() + scaleIn(),
-                        exit = shrinkHorizontally()
+                        exit = fadeOut()
                     ) {
                         UserPanel(
                             modifier = Modifier
-                                .padding(12.dp)
-                                .onFocusChanged {
-                                    if (!it.hasFocus) {
-                                        //settingsButtonFocusRequester.requestFocus()
-                                    }
-                                },
+                                .padding(12.dp),
                             username = userViewModel.username,
                             face = userViewModel.face,
                             onHide = { showUserPanel = false },
@@ -206,7 +200,7 @@ fun MainScreen(
                                 )
                             },
                             onGoLater = {
-                                "按钮放在这只是拿来当摆设的！".toast(context)
+                                context.startActivity(Intent(context, ToViewActivity::class.java))
                             }
                         )
                     }

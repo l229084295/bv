@@ -13,11 +13,13 @@ import dev.aaa1115910.biliapi.repositories.AuthRepository
 import dev.aaa1115910.biliapi.repositories.ChannelRepository
 import dev.aaa1115910.biliapi.repositories.FavoriteRepository
 import dev.aaa1115910.biliapi.repositories.HistoryRepository
+import dev.aaa1115910.biliapi.repositories.ToViewRepository
 import dev.aaa1115910.biliapi.repositories.LoginRepository
 import dev.aaa1115910.biliapi.repositories.PgcRepository
 import dev.aaa1115910.biliapi.repositories.RecommendVideoRepository
 import dev.aaa1115910.biliapi.repositories.SearchRepository
 import dev.aaa1115910.biliapi.repositories.SeasonRepository
+import dev.aaa1115910.biliapi.repositories.UgcRepository
 import dev.aaa1115910.biliapi.repositories.VideoDetailRepository
 import dev.aaa1115910.biliapi.repositories.VideoPlayRepository
 import dev.aaa1115910.bv.dao.AppDatabase
@@ -52,6 +54,7 @@ import dev.aaa1115910.bv.viewmodel.user.FavoriteViewModel
 import dev.aaa1115910.bv.viewmodel.user.FollowViewModel
 import dev.aaa1115910.bv.viewmodel.user.FollowingSeasonViewModel
 import dev.aaa1115910.bv.viewmodel.user.HistoryViewModel
+import dev.aaa1115910.bv.viewmodel.user.ToViewViewModel
 import dev.aaa1115910.bv.viewmodel.user.UpInfoViewModel
 import dev.aaa1115910.bv.viewmodel.video.VideoDetailViewModel
 import kotlinx.coroutines.runBlocking
@@ -155,6 +158,7 @@ val appModule = module {
     single { ChannelRepository() }
     single { FavoriteRepository(get()) }
     single { HistoryRepository(get(), get()) }
+    single { ToViewRepository(get(), get()) }    
     single { SearchRepository(get(), get()) }
     single { VideoPlayRepository(get(), get()) }
     single { RecommendVideoRepository(get(), get()) }
@@ -162,6 +166,7 @@ val appModule = module {
     single { SeasonRepository(get()) }
     single { dev.aaa1115910.biliapi.repositories.UserRepository(get(), get()) }
     single { PgcRepository() }
+    single { UgcRepository(get()) }
     viewModel { DynamicViewModel(get(), get()) }
     viewModel { RecommendViewModel(get()) }
     viewModel { PopularViewModel(get()) }
@@ -170,6 +175,7 @@ val appModule = module {
     viewModel { PlayerViewModel(get()) }
     viewModel { UserViewModel(get()) }
     viewModel { HistoryViewModel(get(), get()) }
+    viewModel { ToViewViewModel(get(), get()) }
     viewModel { FavoriteViewModel(get()) }
     viewModel { UpInfoViewModel(get()) }
     viewModel { FollowViewModel(get()) }

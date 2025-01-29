@@ -2,12 +2,12 @@ import java.io.File
 
 object AppConfiguration {
     const val appId = "dev.aaa1115910.bv"
-    const val compileSdk = 34
+    const val compileSdk = 35
     const val minSdk = 21
-    const val targetSdk = 34
+    const val targetSdk = 35
     private const val major = 0
     private const val minor = 2
-    private const val patch = 9
+    private const val patch = 10
     private const val hotFix = 0
 
     @Suppress("KotlinConstantConditions")
