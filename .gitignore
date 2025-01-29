@@ -10,3 +10,6 @@
 /.idea/jarRepositories.xml
 /.idea/migrations.xml
 /.idea/codeStyles/
+/app/default/release/
+/.kotlin/errors
+/.idea
