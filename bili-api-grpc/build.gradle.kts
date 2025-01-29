@@ -55,4 +55,5 @@ protobuf {
             }
         }
     }
+    generatedFilesBaseDir = "$projectDir"
 }
