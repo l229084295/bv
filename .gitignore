@@ -10,3 +10,7 @@
 /.idea/jarRepositories.xml
 /.idea/migrations.xml
 /.idea/codeStyles/
+/app/default/
+/.idea/AndroidProjectSystem.xml
+/.idea/runConfigurations.xml
+/.kotlin/
