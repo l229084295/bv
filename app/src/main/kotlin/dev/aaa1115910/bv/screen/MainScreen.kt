@@ -125,7 +125,7 @@ fun MainScreen(
                 onShowUserPanel = {
                     showUserPanel = true
                 },
-                onFocusToContent = onFocusToContent,
+                onFocusToContent = { onFocusToContent() },
                 onLogin = {
                     context.startActivity(Intent(context, LoginActivity::class.java))
                 }
