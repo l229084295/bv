@@ -160,6 +160,14 @@ android {
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
+
+    dexOptions {
+        javaMaxHeapSize = "4g"
+        preDexLibraries = false // 是否预Dex库
+        incremental = true // 是否启用增量编译
+        jumboMode = true // 启用jumbo模式，允许方法数超过64k
+        threadCount = 4 // 设置线程数
+    }
 }
 
 java {

@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 687,
-      "versionName": "0.2.9.r687.9da689f.release",
-      "outputFile": "BV_687_0.2.9.r687.9da689f.release_default_universal.apk"
+      "versionCode": 714,
+      "versionName": "0.2.10.r714.5f6c19d.release",
+      "outputFile": "BV_714_0.2.10.r714.5f6c19d.release_default_universal.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/BV_687_0.2.9.r687.9da689f.release_default_universal.dm"
+        "baselineProfiles/1/BV_714_0.2.10.r714.5f6c19d.release_default_universal.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/BV_687_0.2.9.r687.9da689f.release_default_universal.dm"
+        "baselineProfiles/0/BV_714_0.2.10.r714.5f6c19d.release_default_universal.dm"
       ]
     }
   ],
